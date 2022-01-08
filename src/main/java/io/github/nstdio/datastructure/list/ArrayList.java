@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public final class ArrayList<E> implements List<E> {
@@ -27,7 +28,7 @@ public final class ArrayList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return null;
+        return new It();
     }
 
     @Override
@@ -58,10 +59,15 @@ public final class ArrayList<E> implements List<E> {
             return;
         }
 
-        if (data.length == size) {
-            int cap = size * 2;
-            var newData = new Object[cap];
-            System.arraycopy(data, 0, newData, 0, size);
+        int sz = size;
+        var d = data;
+        if (sz + n > data.length) {
+            var newData = new Object[sz + n];
+            System.arraycopy(data, 0, newData, 0, sz);
+            data = newData;
+        } else if (d.length == sz) {
+            var newData = new Object[sz * 2];
+            System.arraycopy(data, 0, newData, 0, sz);
             data = newData;
         }
     }
@@ -120,6 +126,7 @@ public final class ArrayList<E> implements List<E> {
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         checkIndex(index);
+        growIfNecessary(c.size());
         return false;
     }
 
@@ -230,5 +237,24 @@ public final class ArrayList<E> implements List<E> {
      */
     Object[] data() {
         return data;
+    }
+
+    private class It implements Iterator<E> {
+        private int idx;
+
+        @Override
+        public boolean hasNext() {
+            return idx != size;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext())
+                throw new NoSuchElementException();
+
+            @SuppressWarnings("unchecked")
+            E e = (E) data[idx++];
+            return e;
+        }
     }
 }

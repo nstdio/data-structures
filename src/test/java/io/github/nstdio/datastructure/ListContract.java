@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -357,6 +358,28 @@ public interface ListContract {
 
         //then
         assertEquals(0, list.get(0));
+    }
+
+    @Test
+    default void shouldCreateIterator() {
+        //given
+        var list = get(3);
+        var it = list.iterator();
+
+        //when + then
+        assertThat(it).toIterable().containsExactly(0, 1, 2);
+        assertThat(it.hasNext()).isFalse();
+    }
+
+    @Test
+    default void shouldThrowWhenHasNoElements() {
+        //given
+        var list = getChecked(String.class);
+        var it = list.iterator();
+
+        //when
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(it::next);
     }
 
     default List<Integer> get(int size) {
