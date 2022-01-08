@@ -1,5 +1,13 @@
 package io.github.nstdio.datastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -13,14 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public interface ListContract {
     static Stream<Arguments> containsAllPositiveData() {
@@ -277,6 +277,61 @@ public interface ListContract {
         //then
         //noinspection ConstantConditions
         assertEquals(0, list.size());
+    }
+
+    @Test
+    default void shouldRemoveObjectFromStart() {
+        //given
+        var list = get(3);
+
+        //when
+        list.remove((Object) 0);
+
+        //then
+        assertEquals(2, list.size());
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+    }
+
+    @Test
+    default void shouldRemoveObjectFromEnd() {
+        //given
+        var list = get(3);
+
+        //when
+        list.remove((Object) 2);
+
+        //then
+        assertEquals(2, list.size());
+        assertEquals(0, list.get(0));
+        assertEquals(1, list.get(1));
+    }
+
+    @Test
+    default void shouldRemoveObjectFromMiddle() {
+        //given
+        var list = get(3);
+
+        //when
+        list.remove((Object) 1);
+
+        //then
+        assertEquals(2, list.size());
+        assertEquals(0, list.get(0));
+        assertEquals(2, list.get(1));
+    }
+
+    @Test
+    default void shouldReturnFalseIfRemovingNotExistingElement() {
+        //given
+        var list = get(3);
+
+        //when
+        var removed = list.remove((Object) 4);
+
+        //then
+        assertFalse(removed);
+        assertEquals(3, list.size());
     }
 
     default List<Integer> get(int size) {

@@ -82,7 +82,7 @@ public final class ArrayList<E> implements List<E> {
             d[idx] = null;
         } else {
             var len = d.length - 1;
-            System.arraycopy(d, idx + 1, d, idx, len);
+            System.arraycopy(d, idx + 1, d, idx, len - idx);
             d[len] = null;
         }
         size--;
