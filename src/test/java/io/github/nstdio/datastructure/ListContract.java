@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -380,6 +381,95 @@ public interface ListContract {
         //when
         assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(it::next);
+    }
+
+    @Test
+    default void shouldAddAllAtIndex() {
+        //given
+        var a = get(4);
+
+        //when
+        a.addAll(2, List.of(1, 1, 1, 1, 1));
+
+        //then
+        assertThat(a)
+                .containsExactly(0, 1, 1, 1, 1, 1, 1, 2, 3);
+    }
+
+    @Test
+    default void shouldAddAtIndexSimple() {
+        //given
+        var a = get(4);
+
+        //when
+        a.add(0, 5);
+
+        //then
+        assertThat(a)
+                .containsExactly(5, 0, 1, 2, 3);
+    }
+
+    @Test
+    default void shouldAddAtIndex() {
+        //given
+        var list = get(1);
+        var size = RandomUtils.nextInt(1, 255);
+
+        //when
+        for (int i = 0; i < size; i++) {
+            list.add(0, i);
+        }
+
+        //then
+        assertThat(list)
+                .hasSize(size + 1);
+    }
+
+    @Test
+    default void shouldRemoveAll() {
+        //given
+        var list = get(5);
+        var remove = Set.of(1, 2, 4);
+
+        //when
+        var changed = list.removeAll(remove);
+
+        //then
+        assertTrue(changed);
+        assertThat(list)
+                .containsExactly(0, 3);
+    }
+
+    @Test
+    @DisplayName("removeAll should return false when not changed")
+    default void shouldRemoveAll2() {
+        //given
+        var list = get(5);
+        var remove = Set.of(10, 11);
+
+        //when
+        var changed = list.removeAll(remove);
+
+        //then
+        assertFalse(changed);
+        assertThat(list)
+                .containsExactly(0, 1, 2, 3, 4);
+    }
+
+    @Test
+    @DisplayName("removeAll should return false when collection is empty")
+    default void shouldRemoveAll3() {
+        //given
+        var list = get(5);
+        var remove = Set.<Integer>of();
+
+        //when
+        var changed = list.removeAll(remove);
+
+        //then
+        assertFalse(changed);
+        assertThat(list)
+                .containsExactly(0, 1, 2, 3, 4);
     }
 
     default List<Integer> get(int size) {

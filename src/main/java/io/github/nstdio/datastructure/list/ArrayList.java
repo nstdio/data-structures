@@ -55,19 +55,16 @@ public final class ArrayList<E> implements List<E> {
 
     private void growIfNecessary(int n) {
         if (data == null) {
-            data = new Object[8];
+            data = new Object[Math.max(8, n)];
             return;
         }
 
         int sz = size;
-        var d = data;
         if (sz + n > data.length) {
-            var newData = new Object[sz + n];
-            System.arraycopy(data, 0, newData, 0, sz);
-            data = newData;
-        } else if (d.length == sz) {
-            var newData = new Object[sz * 2];
-            System.arraycopy(data, 0, newData, 0, sz);
+            var d = data;
+            var newCap = sz == d.length ? sz * 2 + n : sz + n;
+            var newData = new Object[newCap];
+            System.arraycopy(d, 0, newData, 0, sz);
             data = newData;
         }
     }
@@ -126,17 +123,44 @@ public final class ArrayList<E> implements List<E> {
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         checkIndex(index);
-        growIfNecessary(c.size());
-        return false;
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        var cSize = c.size();
+        growIfNecessary(cSize);
+
+        var d = data;
+        System.arraycopy(d, index, d, index + cSize, index);
+        size += cSize;
+
+        for (Object e : c) {
+            d[index++] = e;
+        }
+
+        return true;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        if (c.isEmpty()) {
+            return false;
+        }
+
+        boolean changed = false;
+        for (Object o : c) {
+            changed |= remove(o);
+        }
+
+        return changed;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        if (c.isEmpty()) {
+            return false;
+        }
+
         return false;
     }
 
@@ -179,6 +203,11 @@ public final class ArrayList<E> implements List<E> {
     public void add(int index, E element) {
         checkIndex(index);
         growIfNecessary(1);
+
+        var d = data;
+        System.arraycopy(d, index, d, index + 1, size - index);
+        size++;
+        d[index] = element;
     }
 
     @Override
