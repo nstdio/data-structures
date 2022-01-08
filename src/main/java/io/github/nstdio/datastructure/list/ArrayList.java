@@ -136,8 +136,7 @@ public final class ArrayList<E> implements List<E> {
     @Override
     public void clear() {
         var d = data;
-        int n = size;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0, n = size; i < n; i++) {
             d[i] = null;
         }
 
@@ -162,8 +161,9 @@ public final class ArrayList<E> implements List<E> {
     @Override
     public E set(int index, E element) {
         checkIndex(index);
-        Object old = data[index];
-        data[index] = element;
+        var d = data;
+        Object old = d[index];
+        d[index] = element;
 
         return (E) old;
     }
@@ -187,7 +187,7 @@ public final class ArrayList<E> implements List<E> {
         }
 
         var d = data;
-        var sz = this.size;
+        var sz = size;
         if (o == null) {
             for (int i = 0; i < sz; i++) {
                 if (d[i] == null) {
