@@ -32,7 +32,10 @@ public final class ArrayList<E> implements List<E> {
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        var n = this.size;
+        var ret = new Object[n];
+        System.arraycopy(data, 0, ret, 0, n);
+        return ret;
     }
 
     @Override

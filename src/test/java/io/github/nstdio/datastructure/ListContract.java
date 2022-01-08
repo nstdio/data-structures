@@ -334,6 +334,31 @@ public interface ListContract {
         assertEquals(3, list.size());
     }
 
+    @Test
+    default void shouldCreateProperArray() {
+        //given
+        var list = get(3);
+
+        //when
+        var objects = list.toArray();
+
+        //then
+        assertThat(objects).containsExactly(0, 1, 2);
+    }
+
+    @Test
+    default void shouldCreateProperNewArray() {
+        //given
+        var list = get(3);
+
+        //when
+        @SuppressWarnings("MismatchedReadAndWriteOfArray") var objects = list.toArray();
+        objects[0] = "5";
+
+        //then
+        assertEquals(0, list.get(0));
+    }
+
     default List<Integer> get(int size) {
         var list = getChecked(Integer.class);
         for (int i = 0; i < size; i++) {
