@@ -510,8 +510,8 @@ public interface ListContract {
     @Test
     default void shouldRemoveAll() {
         //given
-        var list = get(5);
-        var remove = Set.of(1, 2, 4);
+        var list = get(12);
+        var remove = Set.of(4, 5, 8, 9, 15);
 
         //when
         var changed = list.removeAll(remove);
@@ -519,7 +519,7 @@ public interface ListContract {
         //then
         assertTrue(changed);
         assertThat(list)
-                .containsExactly(0, 3);
+                .containsExactly(0, 1, 2, 3, 6, 7, 10, 11);
     }
 
     @Test

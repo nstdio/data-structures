@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.RandomAccess;
+import java.util.function.BiPredicate;
 
 public final class ArrayList<E> implements List<E>, RandomAccess {
     private Object[] data;
@@ -149,35 +150,36 @@ public final class ArrayList<E> implements List<E>, RandomAccess {
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
-        if (c.isEmpty()) {
-            return false;
-        }
-
-        boolean changed = false;
-        for (Object o : c) {
-            changed |= remove(o);
-        }
-
-        return changed;
+    public boolean removeAll(Collection<?> coll) {
+        return remove(coll, (c, o) -> !c.contains(o));
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        return remove(c, Collection::contains);
+    }
+
+    private boolean remove(Collection<?> c, BiPredicate<Collection<?>, Object> contains) {
         if (c.isEmpty()) {
             return false;
         }
 
-        var toRemove = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            var o = data[i];
-
-            if (!c.contains(o)) {
-                toRemove.add(o);
+        int j = 0;
+        Object[] d = data;
+        int s = size;
+        for (int i = 0; i < s; i++) {
+            Object o = d[i];
+            if (contains.test(c, o)) {
+                d[j++] = o;
             }
         }
 
-        return removeAll(toRemove);
+        boolean changed = s != j;
+        while (s > j) {
+            d[s--] = null;
+        }
+        size = s;
+        return changed;
     }
 
     @Override
