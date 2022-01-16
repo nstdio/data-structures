@@ -118,11 +118,19 @@ public final class ArrayList<E> implements List<E>, RandomAccess {
             return false;
         }
 
-        for (E o : c) {
-            add(o);
-        }
+        int cSize = c.size();
+        growIfNecessary(cSize);
 
+        fastAddFrom(size, c, cSize);
         return true;
+    }
+
+    void fastAddFrom(int from, Collection<? extends E> c, int cSize) {
+        Object[] d = data;
+        for (E o : c) {
+            d[from++] = o;
+        }
+        size += cSize;
     }
 
     @Override
@@ -134,15 +142,9 @@ public final class ArrayList<E> implements List<E>, RandomAccess {
 
         var cSize = c.size();
         growIfNecessary(cSize);
+        System.arraycopy(data, index, data, index + cSize, index);
 
-        var d = data;
-        System.arraycopy(d, index, d, index + cSize, index);
-        size += cSize;
-
-        for (Object e : c) {
-            d[index++] = e;
-        }
-
+        fastAddFrom(index, c, cSize);
         return true;
     }
 
