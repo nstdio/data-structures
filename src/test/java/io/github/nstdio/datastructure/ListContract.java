@@ -77,6 +77,16 @@ public interface ListContract {
     }
 
     @Test
+    default void shouldThrowWhenIndexNotFound() {
+        //given
+        var list = get();
+
+        //then + when
+        assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                .isThrownBy(() -> list.get(0));
+    }
+
+    @Test
     default void shouldIncreaseSize() {
         //given
         var list = getChecked(String.class);
@@ -325,6 +335,22 @@ public interface ListContract {
     }
 
     @Test
+    default void shouldRemoveObjectFromEndAndAdd() {
+        //given
+        var list = get(3);
+
+        //when
+        list.remove((Object) 2);
+        list.add(5);
+
+        //then
+        assertEquals(3, list.size());
+        assertEquals(0, list.get(0));
+        assertEquals(1, list.get(1));
+        assertEquals(5, list.get(2));
+    }
+
+    @Test
     default void shouldRemoveObjectFromMiddle() {
         //given
         var list = get(3);
@@ -412,16 +438,30 @@ public interface ListContract {
     }
 
     @Test
-    default void shouldAddAtIndexSimple() {
+    default void shouldAddAtIndexAtMiddle() {
         //given
         var a = get(4);
 
         //when
-        a.add(0, 5);
+        a.add(2, 5);
 
         //then
         assertThat(a)
-                .containsExactly(5, 0, 1, 2, 3);
+                .containsExactly(0, 1, 5, 2, 3);
+    }
+
+    @Test
+    default void shouldAddAtIndexAtEnd() {
+        //given
+        var list = get(4);
+
+        //when
+        list.add(3, 5);
+        list.add(6);
+
+        //then
+        assertThat(list)
+                .containsExactly(0, 1, 2, 5, 3, 6);
     }
 
     @Test
@@ -523,7 +563,7 @@ public interface ListContract {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Should retail all provided values")
     default void retainAll() {
         //given
         var list = get(5);
@@ -534,6 +574,59 @@ public interface ListContract {
 
         //then
         assertThat(list).containsExactly(0, 3);
+    }
+
+    @Test
+    default void shouldSetAtIndexAtStart() {
+        //given
+        var list = get(2);
+
+        //when
+        var old = list.set(0, 2);
+
+        //then
+        assertThat(list).containsExactly(2, 1);
+        assertThat(old).isEqualTo(0);
+    }
+
+    @Test
+    default void shouldSetAtIndexAtEnd() {
+        //given
+        var list = get(3);
+
+        //when
+        var old = list.set(2, 10);
+
+        //then
+        assertThat(list).containsExactly(0, 1, 10);
+        assertThat(old).isEqualTo(2);
+    }
+
+    @Test
+    default void iteratorWithForLoop() {
+        //given
+        final int size = 10;
+        var it = get(size).iterator();
+
+        //when + then
+        for (int i = 0; i < size; i++) {
+            assertTrue(it.hasNext());
+            assertEquals(i, it.next());
+        }
+    }
+
+    @Test
+    default void iteratorWithWhileLoop() {
+        //given
+        final int size = 10;
+        var it = get(size).iterator();
+
+        //when + then
+        int i = 0;
+        while (it.hasNext()) {
+            assertEquals(i++, it.next());
+        }
+        assertEquals(size, i);
     }
 
     private void assumePermitNull() {

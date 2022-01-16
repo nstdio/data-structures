@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.RandomAccess;
 
-public final class ArrayList<E> implements List<E> {
+public final class ArrayList<E> implements List<E>, RandomAccess {
     private Object[] data;
     private int size;
 
