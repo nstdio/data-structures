@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -52,6 +53,13 @@ public interface ListContract {
      * @return The list implementation.
      */
     List<?> get();
+
+    /**
+     * Whether list under the test permits {@code null} elements or not.
+     */
+    default boolean permitsNull() {
+        return true;
+    }
 
     @SuppressWarnings("unchecked")
     default <T> List<T> getChecked(Class<? extends T> cls) {
@@ -140,6 +148,8 @@ public interface ListContract {
 
     @Test
     default void shouldFindByIndexNull() {
+        assumePermitNull();
+
         //given
         var list = getChecked(Integer.class);
         list.add(1);
@@ -492,6 +502,28 @@ public interface ListContract {
 
         //then
         assertEquals(2, lastIndexOf);
+    }
+
+    @Test
+    @DisplayName("lastIndexOf should return proper index")
+    default void lastIndexOfNull() {
+        assumePermitNull();
+
+        //given
+        var list = getChecked(Integer.class);
+        list.add(null);
+        list.add(null);
+        list.add(null);
+
+        //when
+        var lastIndexOf = list.lastIndexOf(null);
+
+        //then
+        assertEquals(2, lastIndexOf);
+    }
+
+    private void assumePermitNull() {
+        assumeTrue(permitsNull(), "This list does not support null elements.");
     }
 
     default List<Integer> get(int size) {
