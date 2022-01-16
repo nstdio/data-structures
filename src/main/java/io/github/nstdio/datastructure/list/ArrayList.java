@@ -161,7 +161,16 @@ public final class ArrayList<E> implements List<E> {
             return false;
         }
 
-        return false;
+        var toRemove = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            var o = data[i];
+
+            if (!c.contains(o)) {
+                toRemove.add(o);
+            }
+        }
+
+        return removeAll(toRemove);
     }
 
     @Override

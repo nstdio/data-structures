@@ -522,6 +522,20 @@ public interface ListContract {
         assertEquals(2, lastIndexOf);
     }
 
+    @Test
+    @DisplayName("")
+    default void retainAll() {
+        //given
+        var list = get(5);
+        var retain = Set.of(0, 3);
+
+        //when
+        list.retainAll(retain);
+
+        //then
+        assertThat(list).containsExactly(0, 3);
+    }
+
     private void assumePermitNull() {
         assumeTrue(permitsNull(), "This list does not support null elements.");
     }
