@@ -403,6 +403,33 @@ public interface ListContract {
     }
 
     @Test
+    default void shouldCreateProperArrayTyped() {
+        //given
+        var list = get(3);
+
+        //when
+        var objects = list.toArray(new Integer[0]);
+
+        //then
+        assertThat(objects).containsExactly(0, 1, 2);
+    }
+
+    @Test
+    default void shouldCreateProperArrayTypedWithSize() {
+        //given
+        var list = get(3);
+
+        //when
+        Integer[] a = new Integer[3];
+        var objects = list.toArray(a);
+
+        //then
+        assertThat(objects)
+                .isSameAs(a)
+                .containsExactly(0, 1, 2);
+    }
+
+    @Test
     default void shouldCreateIterator() {
         //given
         var list = get(3);

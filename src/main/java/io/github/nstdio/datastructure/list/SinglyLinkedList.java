@@ -1,5 +1,6 @@
 package io.github.nstdio.datastructure.list;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,17 +41,19 @@ public final class SinglyLinkedList<E> implements List<E> {
 
     @Override
     public Object[] toArray() {
-        var ret = new Object[size];
-        int i = 0;
-        for (Node<E> n = head; n != null; n = n.next, i++) {
-            ret[i] = n.value;
-        }
-        return ret;
+        return toArray(new Object[0]);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
-        return null;
+        int sz = size;
+        T[] ret = a.length < sz ? (T[]) Array.newInstance(a.getClass().getComponentType(), sz) : a;
+        int i = 0;
+        for (Node<E> n = head; n != null; n = n.next, i++) {
+            ret[i] = (T) n.value;
+        }
+        return ret;
     }
 
     @Override

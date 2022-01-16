@@ -1,5 +1,6 @@
 package io.github.nstdio.datastructure.list;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -34,15 +35,18 @@ public final class ArrayList<E> implements List<E>, RandomAccess {
 
     @Override
     public Object[] toArray() {
-        var n = this.size;
-        var ret = new Object[n];
-        System.arraycopy(data, 0, ret, 0, n);
-        return ret;
+        return toArray(new Object[0]);
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        int n = size;
+        @SuppressWarnings("unchecked")
+        T[] ret = a.length < n ? (T[]) Array.newInstance(a.getClass().getComponentType(), n) : a;
+        //noinspection SuspiciousSystemArraycopy
+        System.arraycopy(data, 0, ret, 0, n);
+
+        return ret;
     }
 
     @Override
