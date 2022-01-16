@@ -218,32 +218,34 @@ public final class ArrayList<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
+        return indexOfRange(o, 0, size);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return indexOfRange(o, size, 0);
+    }
+
+    private int indexOfRange(Object o, int start, int end) {
         if (isEmpty()) {
             return -1;
         }
-
         var d = data;
-        var sz = size;
-        if (o == null) {
-            for (int i = 0; i < sz; i++) {
-                if (d[i] == null) {
+
+        if (start < end) {
+            for (int i = start; i < end; i++) {
+                if (Objects.equals(d[i], o)) {
                     return i;
                 }
             }
         } else {
-            for (int i = 0; i < sz; i++) {
+            for (int i = start - 1; i > end; i--) {
                 if (Objects.equals(d[i], o)) {
                     return i;
                 }
             }
         }
-
         return -1;
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return 0;
     }
 
     @Override

@@ -46,6 +46,11 @@ public interface ListContract {
         );
     }
 
+    /**
+     * The actual list implementation that should be tested.
+     *
+     * @return The list implementation.
+     */
     List<?> get();
 
     @SuppressWarnings("unchecked")
@@ -470,6 +475,23 @@ public interface ListContract {
         assertFalse(changed);
         assertThat(list)
                 .containsExactly(0, 1, 2, 3, 4);
+    }
+
+    @Test
+    @DisplayName("lastIndexOf should return proper index")
+    default void lastIndexOf() {
+        //given
+        var list = getChecked(Integer.class);
+        list.add(1);
+        list.add(2);
+        list.add(2);
+        list.add(3);
+
+        //when
+        var lastIndexOf = list.lastIndexOf(2);
+
+        //then
+        assertEquals(2, lastIndexOf);
     }
 
     default List<Integer> get(int size) {
