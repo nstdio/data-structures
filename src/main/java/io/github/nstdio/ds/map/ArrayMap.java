@@ -127,21 +127,21 @@ public class ArrayMap<K, V> implements Map<K, V> {
     public Set<K> keySet() {
         @SuppressWarnings("unchecked")
         K[] ks = (K[]) keys;
-        return Set.of(ks);
+        return Set.of(Arrays.copyOf(ks, size));
     }
 
     @Override
     public Collection<V> values() {
         @SuppressWarnings("unchecked")
         V[] vs = (V[]) values;
-        return List.of(vs);
+        return List.of(Arrays.copyOf(vs, size));
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
         var es = new Entry[size];
         Object[] ks = keys, vs = values;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < es.length; i++) {
             @SuppressWarnings("unchecked")
             var e = new SimpleEntry<>((K) ks[i], (V) vs[i]);
             es[i] = e;
