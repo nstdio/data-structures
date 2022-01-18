@@ -3,19 +3,19 @@ package io.github.nstdio.ds.map;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 public class ArrayMap<K, V> implements Map<K, V> {
-    private Object[] keys = new Object[16];
-    private Object[] values = new Object[16];
+    private Entry<K, V>[] entries = new Entry[16];
     private int size;
 
-    private static int indexOf(Object value, Object[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            if (Objects.equals(arr[i], value)) {
+    private static <K, V, R> int indexOf(Object value, Entry<K, V>[] arr, int size, Function<Entry<K, V>, R> fn) {
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(fn.apply(arr[i]), value)) {
                 return i;
             }
         }
@@ -23,8 +23,8 @@ public class ArrayMap<K, V> implements Map<K, V> {
         return -1;
     }
 
-    private static boolean contains(Object value, Object[] arr) {
-        return indexOf(value, arr) != -1;
+    private <R> int indexOf(Object o, Function<Entry<K, V>, R> fn) {
+        return indexOf(o, entries, size, fn);
     }
 
     @Override
@@ -39,47 +39,40 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        return contains(key, keys);
+        return indexOf(key, Entry::getKey) != -1;
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return contains(value, values);
+        return indexOf(value, Entry::getValue) != -1;
     }
 
     @Override
     public V get(Object key) {
-        var i = indexOf(key, keys);
+        var i = indexOf(key, Entry::getKey);
         if (i == -1) {
             return null;
         }
 
-        @SuppressWarnings("unchecked")
-        var value = (V) values[i];
-
-        return value;
+        return entries[i].getValue();
     }
 
     @Override
     public V put(K key, V value) {
-        var ks = keys;
-        var vs = values;
+        var es = entries;
         var n = size;
 
-        int i = indexOf(key, ks);
+        int i = indexOf(key, Entry::getKey);
         boolean found = i != -1;
         i = found ? i : n;
-        @SuppressWarnings("unchecked")
-        V old = found ? (V) vs[i] : null;
+        V old = found ? es[i].getValue() : null;
 
-        if (!found && ks.length == n) {
+        if (!found && es.length == n) {
             int newLen = n * 2;
-            ks = keys = Arrays.copyOf(ks, newLen);
-            vs = values = Arrays.copyOf(vs, newLen);
+            es = entries = Arrays.copyOf(es, newLen);
         }
 
-        ks[i] = key;
-        vs[i] = value;
+        es[i] = new SimpleEntry<>(key, value);
 
         if (!found) {
             size = n + 1;
@@ -89,7 +82,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
     @Override
     public V remove(Object key) {
-        final int i = indexOf(key, keys);
+        final int i = indexOf(key, Entry::getKey);
         if (i == -1) {
             return null;
         }
@@ -97,15 +90,13 @@ public class ArrayMap<K, V> implements Map<K, V> {
     }
 
     private V removeAt(int i) {
-        Object[] ks = keys, vs = values;
+        var es = entries;
         var n = size;
 
-        @SuppressWarnings("unchecked")
-        V old = (V) vs[i];
+        V old = es[i].getValue();
 
         int shiftLen = Math.max(n - 1, 1);
-        System.arraycopy(ks, i + 1, ks, i, shiftLen);
-        System.arraycopy(vs, i + 1, vs, i, shiftLen);
+        System.arraycopy(es, i + 1, es, i, shiftLen);
         size = n - 1;
 
         return old;
@@ -118,37 +109,38 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
     @Override
     public void clear() {
-        Arrays.fill(keys, null);
-        Arrays.fill(values, null);
+        Arrays.fill(entries, null);
         size = 0;
     }
 
     @Override
     public Set<K> keySet() {
-        @SuppressWarnings("unchecked")
-        K[] ks = (K[]) keys;
-        return Set.of(Arrays.copyOf(ks, size));
+        var ret = new HashSet<K>(size);
+        for (int i = 0; i < size; i++) {
+            ret.add(entries[i].getKey());
+        }
+
+        return ret;
     }
 
     @Override
     public Collection<V> values() {
         @SuppressWarnings("unchecked")
-        V[] vs = (V[]) values;
-        return List.of(Arrays.copyOf(vs, size));
+        V[] ret = (V[]) new Object[size];
+        for (int i = 0; i < size; i++) {
+            ret[i] = entries[i].getValue();
+        }
+
+        return Arrays.asList(ret);
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        var es = new Entry[size];
-        Object[] ks = keys, vs = values;
-        for (int i = 0; i < es.length; i++) {
-            @SuppressWarnings("unchecked")
-            var e = new SimpleEntry<>((K) ks[i], (V) vs[i]);
-            es[i] = e;
+        var ret = new HashSet<Entry<K, V>>(size);
+        for (int i = 0; i < size; i++) {
+            ret.add(entries[i]);
         }
 
-        @SuppressWarnings("unchecked")
-        var ret = (Entry<K, V>[]) es;
-        return Set.of(ret);
+        return ret;
     }
 }

@@ -1,5 +1,6 @@
 package io.github.nstdio.ds.map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -83,5 +84,21 @@ public interface MapContract {
         for (int i = 0; i < r1; i++) {
             assertEquals(i * 2, map.get(i));
         }
+    }
+
+    @Test
+    default void shouldReturnProperKeySet() {
+        //given
+        Map<String, Integer> map = get();
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("c", 3);
+
+        //when
+
+        //then
+        assertThat(map.keySet())
+                .hasSize(3)
+                .contains("a", "b", "c");
     }
 }
