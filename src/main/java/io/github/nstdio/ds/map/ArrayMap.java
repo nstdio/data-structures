@@ -1,7 +1,9 @@
 package io.github.nstdio.ds.map;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -123,16 +125,30 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
     @Override
     public Set<K> keySet() {
-        return null;
+        @SuppressWarnings("unchecked")
+        K[] ks = (K[]) keys;
+        return Set.of(ks);
     }
 
     @Override
     public Collection<V> values() {
-        return null;
+        @SuppressWarnings("unchecked")
+        V[] vs = (V[]) values;
+        return List.of(vs);
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return null;
+        var es = new Entry[size];
+        Object[] ks = keys, vs = values;
+        for (int i = 0; i < size; i++) {
+            @SuppressWarnings("unchecked")
+            var e = new SimpleEntry<>((K) ks[i], (V) vs[i]);
+            es[i] = e;
+        }
+
+        @SuppressWarnings("unchecked")
+        var ret = (Entry<K, V>[]) es;
+        return Set.of(ret);
     }
 }
