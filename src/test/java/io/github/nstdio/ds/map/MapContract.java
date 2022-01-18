@@ -51,8 +51,38 @@ public interface MapContract {
 
         //when + then
         assertNull(map.put("a", 1));
+        assertEquals(1, map.size());
+
         assertEquals(1, map.put("a", 2));
+        assertEquals(1, map.size());
+
         assertEquals(2, map.put("a", 3));
+    }
+
+    @Test
+    default void shouldBeAbleToCheckValue() {
+        //given
+        Map<String, Integer> map = get();
+
+        //when
+        map.put("a", 1);
+
+        //then
+        assertTrue(map.containsValue(1));
+        assertFalse(map.containsValue(2));
+    }
+
+    @Test
+    default void shouldBeAbleToCheckKey() {
+        //given
+        Map<String, Integer> map = get();
+
+        //when
+        map.put("a", 1);
+
+        //then
+        assertTrue(map.containsKey("a"));
+        assertFalse(map.containsKey("b"));
     }
 
     @Test
@@ -64,25 +94,28 @@ public interface MapContract {
         map.put("a", 1);
 
         //then
+        assertEquals(1, map.size());
         assertEquals(1, map.remove("a"));
         assertFalse(map.containsKey("a"));
         assertNull(map.get("a"));
+        assertTrue(map.isEmpty());
     }
 
     @RepeatedTest(32)
     default void shouldPutManyEntries() {
         //given
-        var r1 = RandomUtils.nextInt(1, 8196);
+        var n = RandomUtils.nextInt(1, 8196);
         Map<Integer, Integer> map = get();
 
         //when
-        for (int i = 0; i < r1; i++) {
+        for (int i = 0; i < n; i++) {
             map.put(i, i * 2);
         }
 
         //then
-        for (int i = 0; i < r1; i++) {
-            assertEquals(i * 2, map.get(i));
+        for (int i = 0; i < n; i++) {
+            assertEquals(i * 2, map.remove(i));
+            assertEquals(n - i - 1, map.size());
         }
     }
 
@@ -95,10 +128,41 @@ public interface MapContract {
         map.put("c", 3);
 
         //when
+        var keySet = map.keySet();
 
         //then
-        assertThat(map.keySet())
+        assertThat(keySet)
                 .hasSize(3)
                 .contains("a", "b", "c");
+    }
+
+    @Test
+    default void shouldKeepProperMapping() {
+        //given
+        Map<String, Integer> map = get();
+        map.put("Aa", 1);
+        map.put("BB", 2);
+
+        //when
+        assertEquals(2, map.size());
+        assertEquals(1, map.get("Aa"));
+        assertEquals(2, map.get("BB"));
+    }
+
+    @Test
+    default void shouldClear() {
+        //given
+        Map<Integer, Integer> map = get();
+        var r1 = RandomUtils.nextInt(1, 8196);
+        for (int i = 0; i < r1; i++) {
+            map.put(i, i);
+        }
+
+        //when
+        map.clear();
+
+        //then
+        //noinspection ConstantConditions
+        assertTrue(map.isEmpty());
     }
 }
