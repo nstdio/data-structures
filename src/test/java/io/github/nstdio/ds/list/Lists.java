@@ -1,4 +1,4 @@
-package io.github.nstdio.datastructure.list;
+package io.github.nstdio.ds.list;
 
 import java.util.List;
 

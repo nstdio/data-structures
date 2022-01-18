@@ -1,6 +1,4 @@
-package io.github.nstdio.datastructure.list;
-
-import io.github.nstdio.datastructure.ListContract;
+package io.github.nstdio.ds.list;
 
 import java.util.LinkedList;
 import java.util.List;

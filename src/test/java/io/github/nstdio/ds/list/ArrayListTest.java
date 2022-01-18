@@ -1,6 +1,5 @@
-package io.github.nstdio.datastructure.list;
+package io.github.nstdio.ds.list;
 
-import io.github.nstdio.datastructure.ListContract;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
