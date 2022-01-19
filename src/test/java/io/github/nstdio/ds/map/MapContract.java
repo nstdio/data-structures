@@ -106,7 +106,7 @@ public interface MapContract {
     @RepeatedTest(32)
     default void shouldPutManyEntries() {
         //given
-        var n = RandomUtils.nextInt(1, 8196);
+        var n = RandomUtils.nextInt(1024, 8196);
         Map<Integer, Integer> map = get();
 
         //when
