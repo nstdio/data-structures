@@ -39,9 +39,11 @@ public interface MapContract {
 
         //when
         map.put("a", 1);
+        map.put("b", 2);
 
         //then
         assertEquals(1, map.get("a"));
+        assertEquals(2, map.get("b"));
     }
 
     @Test
@@ -153,8 +155,8 @@ public interface MapContract {
     default void shouldClear() {
         //given
         Map<Integer, Integer> map = get();
-        var r1 = RandomUtils.nextInt(1, 8196);
-        for (int i = 0; i < r1; i++) {
+        var n = RandomUtils.nextInt(1, 8196);
+        for (int i = 0; i < n; i++) {
             map.put(i, i);
         }
 
