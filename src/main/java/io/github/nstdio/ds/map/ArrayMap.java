@@ -59,16 +59,16 @@ public class ArrayMap<K, V> extends AbstractMap<K, V> {
         int i = indexOf(key, Entry::getKey);
         boolean found = i != -1;
         i = found ? i : n;
-        V old = found ? es[i].getValue() : null;
 
         if (!found && es.length == n) {
-            int newLen = n * 2;
-            es = entries = Arrays.copyOf(es, newLen);
+            es = entries = Arrays.copyOf(es, n * 2);
         }
 
-        es[i] = new SimpleEntry<>(key, value);
-
-        if (!found) {
+        V old = null;
+        if (found) {
+            old = es[i].setValue(value);
+        } else {
+            es[i] = new SimpleEntry<>(key, value);
             size = n + 1;
         }
         return old;
