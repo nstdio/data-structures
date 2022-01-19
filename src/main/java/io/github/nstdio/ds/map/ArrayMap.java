@@ -1,15 +1,14 @@
 package io.github.nstdio.ds.map;
 
-import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
-public class ArrayMap<K, V> implements Map<K, V> {
+public class ArrayMap<K, V> extends AbstractMap<K, V> {
     private Entry<K, V>[] entries = new Entry[16];
     private int size;
 
@@ -30,11 +29,6 @@ public class ArrayMap<K, V> implements Map<K, V> {
     @Override
     public int size() {
         return size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
     }
 
     @Override
@@ -114,31 +108,11 @@ public class ArrayMap<K, V> implements Map<K, V> {
     }
 
     @Override
-    public Set<K> keySet() {
-        var ret = new HashSet<K>(size);
-        for (int i = 0; i < size; i++) {
-            ret.add(entries[i].getKey());
-        }
-
-        return ret;
-    }
-
-    @Override
-    public Collection<V> values() {
-        @SuppressWarnings("unchecked")
-        V[] ret = (V[]) new Object[size];
-        for (int i = 0; i < size; i++) {
-            ret[i] = entries[i].getValue();
-        }
-
-        return Arrays.asList(ret);
-    }
-
-    @Override
     public Set<Entry<K, V>> entrySet() {
         var ret = new HashSet<Entry<K, V>>(size);
+        var es = entries;
         for (int i = 0; i < size; i++) {
-            ret.add(entries[i]);
+            ret.add(es[i]);
         }
 
         return ret;
