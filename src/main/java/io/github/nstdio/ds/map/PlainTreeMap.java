@@ -70,11 +70,16 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
             } else if (n.right == null) {
                 n = n.left;
             } else {
-                Node<K, V> minN = min(n.right);
-                n.key = minN.key;
-                n.value = minN.value;
+                Node<K, V> m = min(n.right);
 
-                n.right = rm(n.right, n.key);
+                if (m.parent == n) {
+                    m.parent.right = m.right;
+                } else {
+                    m.parent.left = m.right;
+                }
+
+                n.key = m.key;
+                n.value = m.value;
             }
         }
 
