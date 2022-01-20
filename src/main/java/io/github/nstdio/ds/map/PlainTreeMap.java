@@ -22,13 +22,13 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V get(Object key) {
-        var n = findNode(key);
+        var n = find(key);
         return n != null ? n.value : null;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return findNode(key) != null;
+        return find(key) != null;
     }
 
     @Override
@@ -37,14 +37,14 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
     }
 
     private V removeNode(Object key) {
-        Node<K, V> n = findNode(key);
+        Node<K, V> n = find(key);
         if (n == null) {
             return null;
         }
         size--;
         V old = n.value;
 
-        if (n.parent == root || n.parent == null) {
+        if (n == root || n.parent == root) {
             root = rm(root, key);
         } else {
             rm(n.parent, key);
@@ -128,7 +128,7 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
         return value;
     }
 
-    private Node<K, V> findNode(Object key) {
+    private Node<K, V> find(Object key) {
         Comparable<? super K> k = asComparable(key);
 
         Node<K, V> n = root;
