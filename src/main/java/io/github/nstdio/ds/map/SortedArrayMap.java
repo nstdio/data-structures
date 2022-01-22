@@ -37,11 +37,11 @@ public final class SortedArrayMap<K, V> extends AbstractMap<K, V> {
         int i = indexFor(key);
 
         if (i < 0) {
-            int ins = -(i + 1);
             if (es.length == n) {
                 es = entries = Arrays.copyOf(es, n * 2);
             }
 
+            int ins = -(i + 1);
             if (ins != n) {
                 System.arraycopy(es, ins, es, ins + 1, Math.max(n - ins, 1));
             }
@@ -51,8 +51,7 @@ public final class SortedArrayMap<K, V> extends AbstractMap<K, V> {
             return null;
         }
 
-        var e = es[i];
-        return e.setValue(value);
+        return es[i].setValue(value);
     }
 
     @Override
