@@ -64,4 +64,18 @@ class PlainTreeMapTest implements MapContract {
         assertThat(map)
                 .containsExactly(entry(1, 1), entry(6, 6));
     }
+
+    @Test
+    void shouldPutSimple() {
+        //given
+        Map<Integer, Integer> map = get();
+
+        //when
+        map.put(1, 1);
+        map.put(2, 1);
+        map.put(3, 1);
+
+        //then
+        assertThat(map).containsKeys(1, 2, 3);
+    }
 }

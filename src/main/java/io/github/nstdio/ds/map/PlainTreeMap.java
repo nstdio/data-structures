@@ -1,12 +1,13 @@
 package io.github.nstdio.ds.map;
 
+import static io.github.nstdio.ds.map.Nodes.asComparable;
+import static io.github.nstdio.ds.map.Nodes.min;
+
 import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
-    private Node<K, V> root;
+    private BinaryNode<K, V> root;
     private int size;
 
     @Override
@@ -23,7 +24,7 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
     @Override
     public V get(Object key) {
         var n = find(key);
-        return n != null ? n.value : null;
+        return n != null ? n.getValue() : null;
     }
 
     @Override
@@ -37,59 +38,52 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
     }
 
     private V removeNode(Object key) {
-        Node<K, V> n = find(key);
+        BinaryNode<K, V> n = find(key);
         if (n == null) {
             return null;
         }
         size--;
-        V old = n.value;
+        V old = n.getValue();
 
-        if (n == root || n.parent == root) {
+        if (n == root || n.parent() == root) {
             root = rm(root, key);
         } else {
-            rm(n.parent, key);
+            rm(n.parent(), key);
         }
 
         return old;
     }
 
-    private Node<K, V> rm(Node<K, V> n, Object k) {
+    private BinaryNode<K, V> rm(BinaryNode<K, V> n, Object k) {
         if (n == null) {
             return null;
         }
 
-        int cmp = asComparable(k).compareTo(n.key);
+        int cmp = asComparable(k).compareTo(n.getKey());
 
         if (cmp < 0) {
-            n.left = rm(n.left, k);
+            n.left(rm(n.left(), k));
         } else if (cmp > 0) {
-            n.right = rm(n.right, k);
+            n.right(rm(n.right(), k));
         } else {
-            if (n.left == null) {
-                n = n.right;
-            } else if (n.right == null) {
-                n = n.left;
+            if (n.left() == null) {
+                n = n.right();
+            } else if (n.right() == null) {
+                n = n.left();
             } else {
-                Node<K, V> m = min(n.right);
+                BinaryNode<K, V> m = min(n.right());
 
-                if (m.parent == n) {
-                    m.parent.right = m.right;
+                if (m.parent() == n) {
+                    m.parent().parent(m.right());
                 } else {
-                    m.parent.left = m.right;
+                    m.parent().left(m.right());
                 }
 
-                n.key = m.key;
-                n.value = m.value;
+                n.setKey(m.getKey());
+                n.setValue(m.getValue());
             }
         }
 
-        return n;
-    }
-
-    private Node<K, V> min(Node<K, V> n) {
-        while (n.left != null) {
-            n = n.left;
-        }
         return n;
     }
 
@@ -99,7 +93,7 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
             throw new IllegalArgumentException();
         }
         if (root == null) {
-            root = new Node<>(key, value);
+            root = new BinaryNode<>(key, value);
             size++;
             return null;
         }
@@ -107,23 +101,23 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
         return put(root, key, value);
     }
 
-    private V put(Node<K, V> p, K key, V value) {
+    private V put(BinaryNode<K, V> p, K key, V value) {
         Comparable<? super K> k = asComparable(key);
         while (p != null) {
-            int cmp = k.compareTo(p.key);
+            int cmp = k.compareTo(p.getKey());
             if (cmp == 0) {
                 return p.setValue(value);
             }
 
-            Node<K, V> n = cmp < 0 ? p.left : p.right;
+            BinaryNode<K, V> n = p.direction(cmp);
             if (n == null) {
-                n = new Node<>(key, value);
+                n = new BinaryNode<>(key, value);
                 if (cmp < 0) {
-                    p.left = n;
+                    p.left(n);
                 } else {
-                    p.right = n;
+                    p.right(n);
                 }
-                n.parent = p;
+                n.parent(p);
                 size++;
                 break;
             }
@@ -133,79 +127,12 @@ public class PlainTreeMap<K, V> extends AbstractMap<K, V> {
         return value;
     }
 
-    private Node<K, V> find(Object key) {
-        Comparable<? super K> k = asComparable(key);
-
-        Node<K, V> n = root;
-        while (n != null) {
-            var cmp = k.compareTo(n.key);
-            if (cmp == 0) {
-                return n;
-            }
-
-            n = cmp < 0 ? n.left : n.right;
-        }
-
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Comparable<? super K> asComparable(Object key) {
-        if (key == null) {
-            throw new IllegalArgumentException();
-        }
-
-        return (Comparable<? super K>) key;
+    private BinaryNode<K, V> find(Object key) {
+        return Nodes.find(root, key);
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        if (root == null) {
-            return Set.of();
-        }
-        Set<Entry<K, V>> ret = new LinkedHashSet<>(size);
-        var s = new ArrayDeque<Node<K, V>>();
-        var n = root;
-
-        while (!s.isEmpty() || n != null) {
-            if (n != null) {
-                s.push(n);
-                n = n.left;
-            } else {
-                n = s.pop();
-                ret.add(new SimpleEntry<>(n.getKey(), n.getValue()));
-                n = n.right;
-            }
-        }
-
-        return ret;
-    }
-
-    static final class Node<K, V> implements Entry<K, V> {
-        private K key;
-        private V value;
-        private Node<K, V> left, right, parent;
-
-        Node(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V v) {
-            var old = value;
-            value = v;
-            return old;
-        }
+        return Nodes.inorderEntrySet(root);
     }
 }
