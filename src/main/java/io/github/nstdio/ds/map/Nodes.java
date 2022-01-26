@@ -1,10 +1,11 @@
 package io.github.nstdio.ds.map;
 
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 final class Nodes {
     private Nodes() {
@@ -34,6 +35,14 @@ final class Nodes {
         }
 
         Set<Map.Entry<K, V>> ret = new LinkedHashSet<>();
+        traverseInOrder(root, n -> ret.add(new SimpleEntry<>(n.getKey(), n.getValue())));
+        return ret;
+    }
+
+    static <K, V> void traverseInOrder(BinaryNode<K, V> root, Consumer<BinaryNode<K, V>> visitor) {
+        if (root == null) {
+            return;
+        }
         var s = new ArrayDeque<BinaryNode<K, V>>();
         var n = root;
 
@@ -43,12 +52,10 @@ final class Nodes {
                 n = n.left();
             } else {
                 n = s.pop();
-                ret.add(new AbstractMap.SimpleEntry<>(n.getKey(), n.getValue()));
+                visitor.accept(n);
                 n = n.right();
             }
         }
-
-        return ret;
     }
 
     @SuppressWarnings("unchecked")

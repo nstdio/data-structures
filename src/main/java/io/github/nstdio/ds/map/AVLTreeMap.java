@@ -136,7 +136,6 @@ public final class AVLTreeMap<K, V> extends AbstractMap<K, V> {
         while (p != null) {
             if (!p.isBalanced()) {
                 balance(p);
-                break;
             }
             p = p.parent();
         }
